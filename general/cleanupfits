@@ -1,0 +1,13 @@
+#!/bin/sh
+
+rm -rf ./*z.fits
+rm -rf ./*zb.fits
+rm -rf ./*zbf.fits
+rm -rf ./masterskyflat*.fits
+rm -rf ./masterskyflat*norm.fits
+rm -rf ./masterbias*.fits
+rm -rf ./masterdark*.fits
+rm -rf ./*flat*.fits
+
+
+echo "All cleaned up!"

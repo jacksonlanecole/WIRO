@@ -1,0 +1,262 @@
+delete bias.list
+delete skyflat_u_temp.list
+delete skyflat_g_temp.list
+delete skyflat_r_temp.list
+delete skyflat_i_temp.list
+delete skyflat_z_temp.list
+delete flat.list
+delete dark.list
+
+files *.fit > bias.list
+files *.fit > skyflat_u_temp.list
+files *.fit > skyflat_g_temp.list
+files *.fit > skyflat_r_temp.list
+files *.fit > skyflat_i_temp.list
+files *.fit > skyflat_z_temp.list
+files *.fit > object.list
+files *.fit > flat.list
+files *.fit > dark.list
+
+wget physics.uwyo.edu/~WIRO/DoublePrime/WDPzero.cl
+
+files *.fit > infiles.txt
+
+# edit files to contain only the necessary images
+hedit @bias.list ccdtype bias add+ verify-
+hedit @bias.list imagetype zero add+ verify-
+hedit @object.list ccdtype object add+ verify-
+hedit @object.list imagetype object add+ verify-
+hedit @flat.list ccdtype flat add+ verify-
+hedit @flat.list imagetype flat add+ verify-
+hedit @dark.list ccdtype dark add+ verify-
+hedit @dark.list imagetype dark add+ verify-
+
+task WDPzero=WDPzero.cl
+WDPzero("infiles.txt")
+
+# Use sed below to streamline editing these files
+# cp bias.list bias_z.list
+# cp flat.list flat_z.list
+# cp object.list object_z.list
+# cp dark.list dark_z.list
+
+delete bias_z.list
+delete flat_z.list
+delete object_z.list
+delete dark_z.list
+
+sed 's/.fit/_z.fits/' bias.list > bias_z.list
+sed 's/.fit/_z.fits/' flat.list > flat_z.list
+sed 's/.fit/_z.fits/' object.list > object_z.list
+sed 's/.fit/_z.fits/' dark.list > dark_z.list
+
+del zero_out.list ver-
+files *_z.fits > zero_out.list
+cp zero_out.list bias_out_temp.list
+!sed 's/_z.fits/_zb.fits/' bias_out_temp.list > bias_out.list
+
+unlearn imarith
+imarith @zero_out.list - masterbias_average.fits @bias_out.list
+
+!sed 's/.fit/_zb.fits/' skyflat_u_temp.list > skyflat_u.list
+!sed 's/.fit/_zb.fits/' skyflat_z_temp.list > skyflat_z.list
+!sed 's/.fit/_zb.fits/' skyflat_i_temp.list > skyflat_i.list
+!sed 's/.fit/_zb.fits/' skyflat_r_temp.list > skyflat_r.list
+!sed 's/.fit/_zb.fits/' skyflat_g_temp.list > skyflat_g.list
+
+# 1. Combining with combine=average reject=none scale=none weight=none
+del masterskyflat_u.fits
+del masterskyflat_g.fits
+del masterskyflat_r.fits
+del masterskyflat_i.fits
+del masterskyflat_z.fits
+imcombine @skyflat_u.list masterskyflat_u.fits combine=average reject=none scale=none weight=none
+imcombine @skyflat_g.list masterskyflat_g.fits combine=average reject=none scale=none weight=none
+imcombine @skyflat_r.list masterskyflat_r.fits combine=average reject=none scale=none weight=none
+imcombine @skyflat_i.list masterskyflat_i.fits combine=average reject=none scale=none weight=none
+imcombine @skyflat_z.list masterskyflat_z.fits combine=average reject=none scale=none weight=none
+
+# 2. Combining with combine=median reject=none scale=none weight=none
+del masterskyflat_u.fits
+del masterskyflat_g.fits
+del masterskyflat_r.fits
+del masterskyflat_i.fits
+del masterskyflat_z.fits
+imcombine @skyflat_u.list masterskyflat_u.fits combine=median reject=none scale=none weight=none
+imcombine @skyflat_g.list masterskyflat_g.fits combine=median reject=none scale=none weight=none
+imcombine @skyflat_r.list masterskyflat_r.fits combine=median reject=none scale=none weight=none
+imcombine @skyflat_i.list masterskyflat_i.fits combine=median reject=none scale=none weight=none
+imcombine @skyflat_z.list masterskyflat_z.fits combine=median reject=none scale=none weight=none
+
+# 3. Combining with combine=average reject=avsigclip scale=none weight=none
+del masterskyflat_u.fits
+del masterskyflat_g.fits
+del masterskyflat_r.fits
+del masterskyflat_i.fits
+del masterskyflat_z.fits
+imcombine @skyflat_u.list masterskyflat_u.fits combine=average reject=avsigclip scale=none weight=none
+imcombine @skyflat_g.list masterskyflat_g.fits combine=average reject=avsigclip scale=none weight=none
+imcombine @skyflat_r.list masterskyflat_r.fits combine=average reject=avsigclip scale=none weight=none
+imcombine @skyflat_i.list masterskyflat_i.fits combine=average reject=avsigclip scale=none weight=none
+imcombine @skyflat_z.list masterskyflat_z.fits combine=average reject=avsigclip scale=none weight=none
+
+# 4. Combining with combine=average reject=avsigclip scale=median weight=median
+# NOTE: THIS ONE WORKS PRETTY WELL
+del masterskyflat_u.fits
+del masterskyflat_g.fits
+del masterskyflat_r.fits
+del masterskyflat_i.fits
+del masterskyflat_z.fits
+imcombine @skyflat_u.list masterskyflat_u.fits combine=average reject=avsigclip scale=median weight=median
+imcombine @skyflat_g.list masterskyflat_g.fits combine=average reject=avsigclip scale=median weight=median
+imcombine @skyflat_r.list masterskyflat_r.fits combine=average reject=avsigclip scale=median weight=median
+imcombine @skyflat_i.list masterskyflat_i.fits combine=average reject=avsigclip scale=median weight=median
+imcombine @skyflat_z.list masterskyflat_z.fits combine=average reject=avsigclip scale=median weight=median
+
+# 5. Combining with combine=median reject=avsigclip scale=median weight=median
+# !!!!!!USE THIS METHOD!!!!!!
+del masterskyflat_u.fits
+del masterskyflat_g.fits
+del masterskyflat_r.fits
+del masterskyflat_i.fits
+del masterskyflat_z.fits
+imcombine @skyflat_u.list masterskyflat_u.fits combine=median reject=avsigclip scale=median weight=median
+imcombine @skyflat_g.list masterskyflat_g.fits combine=median reject=avsigclip scale=median weight=median
+imcombine @skyflat_r.list masterskyflat_r.fits combine=median reject=avsigclip scale=median weight=median
+imcombine @skyflat_i.list masterskyflat_i.fits combine=median reject=avsigclip scale=median weight=median
+imcombine @skyflat_z.list masterskyflat_z.fits combine=median reject=avsigclip scale=median weight=median
+
+imstat masterskyflat_u.fits
+imstat masterskyflat_g.fits
+imstat masterskyflat_r.fits
+imstat masterskyflat_i.fits
+imstat masterskyflat_z.fits
+
+# The numbers below are where the means for each of the images go after running imstat on each
+delete masterskyflat_u_norm.fits
+delete masterskyflat_g_norm.fits
+delete masterskyflat_r_norm.fits
+delete masterskyflat_i_norm.fits
+delete masterskyflat_z_norm.fits
+
+imarith masterskyflat_u.fits / 38368 masterskyflat_u_norm.fits
+imarith masterskyflat_g.fits / 13459 masterskyflat_g_norm.fits
+imarith masterskyflat_r.fits / 15650 masterskyflat_r_norm.fits
+imarith masterskyflat_i.fits / 63680 masterskyflat_i_norm.fits
+imarith masterskyflat_z.fits / 14681 masterskyflat_z_norm.fits
+
+delete masterscience.list
+delete masterscience_g.list
+delete masterscience_r.list
+delete masterscience_u.list
+delete masterscience_z.list
+delete masterscience_i.list
+delete masterscience_g_f.list
+delete masterscience_r_f.list
+delete masterscience_u_f.list
+delete masterscience_z_f.list
+delete masterscience_i_f.list
+
+hselect images=*_zb.fits fields=$I,FILTER expr=yes > masterscience.list
+
+!grep "Filter 1: g" masterscience.list | cut -c1-12 > masterscience_g.list
+!grep "Filter 2: r" masterscience.list | cut -c1-12 > masterscience_r.list
+!grep "Filter 3: u" masterscience.list | cut -c1-12 > masterscience_u.list
+!grep "Filter 4: z" masterscience.list | cut -c1-12 > masterscience_z.list
+!grep "Filter 5: i" masterscience.list | cut -c1-12 > masterscience_i.list
+
+#!cut -c1-12 masterscience_g.list
+#!cut -c1-12 masterscience_r.list
+#!cut -c1-12 masterscience_u.list
+#!cut -c1-12 masterscience_z.list
+#!cut -c1-12 masterscience_i.list
+
+# cp masterscience_g.list masterscience_g_f.list
+#cp masterscience_r.list masterscience_r_f.list
+#cp masterscience_u.list masterscience_u_f.list
+#cp masterscience_z.list masterscience_z_f.list
+#cp masterscience_i.list masterscience_i_f.list
+
+!sed 's/_zb.fits/_zbf.fits/' masterscience_g.list > masterscience_g_f.list
+!sed 's/_zb.fits/_zbf.fits/' masterscience_r.list > masterscience_r_f.list
+!sed 's/_zb.fits/_zbf.fits/' masterscience_u.list > masterscience_u_f.list
+!sed 's/_zb.fits/_zbf.fits/' masterscience_z.list > masterscience_z_f.list
+!sed 's/_zb.fits/_zbf.fits/' masterscience_i.list > masterscience_i_f.list
+
+imarith @masterscience_g.list / masterskyflat_g_norm.fits @masterscience_g_f.list
+imarith @masterscience_r.list / masterskyflat_r_norm.fits @masterscience_r_f.list
+imarith @masterscience_u.list / masterskyflat_u_norm.fits @masterscience_u_f.list
+imarith @masterscience_z.list / masterskyflat_z_norm.fits @masterscience_z_f.list
+imarith @masterscience_i.list / masterskyflat_i_norm.fits @masterscience_i_f.list
+
+mkdir _zbfiles && mv ./*_zb.fits ./_zbfiles/
+
+del object_filter.list ver-
+del object_zbf_g.list ver-
+del object_zbf_r.list ver-
+del object_zbf_u.list ver-
+del object_zbf_z.list ver-
+del object_zbf_i.list ver-
+del object_zbf_g.tmp ver-
+del object_zbf_r.tmp ver-
+del object_zbf_u.tmp ver-
+del object_zbf_z.tmp ver-
+del object_zbf_i.tmp ver-
+del object_zbf_g.cl ver-
+del object_zbf_r.cl ver-
+del object_zbf_u.cl ver-
+del object_zbf_z.cl ver-
+del object_zbf_i.cl ver-
+
+
+!sed 's/.fit/_zbf.fits/' object.list > object_zbf.list
+hselect images=@object_zbf.list fields=$I,FILTER expr=yes > object_filter.list
+
+# Change the second limit in the cut command to reflect the length of the string of interest
+!grep "Filter 1: g" object_filter.list | cut -c1-13 > object_zbf_g.list
+!grep "Filter 2: r" object_filter.list | cut -c1-13 > object_zbf_r.list
+!grep "Filter 3: u" object_filter.list | cut -c1-13 > object_zbf_u.list
+!grep "Filter 4: z" object_filter.list | cut -c1-13 > object_zbf_z.list
+!grep "Filter 5: i" object_filter.list | cut -c1-13 > object_zbf_i.list
+
+mkdir filter_g 
+mkdir filter_r 
+mkdir filter_u
+mkdir filter_z
+mkdir filter_i
+!sed 's/a/mv a/' object_zbf_g.list > object_zbf_g.tmp
+!sed 's/.fits/.fits .\/filter_g\//' object_zbf_g.tmp > object_zbf_g.cl
+cat object_zbf_g.cl
+
+!sed 's/a/mv a/' object_zbf_r.list > object_zbf_r.tmp
+!sed 's/.fits/.fits .\/filter_r\//' object_zbf_r.tmp > object_zbf_r.cl
+
+!sed 's/a/mv a/' object_zbf_u.list > object_zbf_u.tmp
+!sed 's/.fits/.fits .\/filter_u\//' object_zbf_u.tmp > object_zbf_u.cl
+
+!sed 's/a/mv a/' object_zbf_z.list > object_zbf_z.tmp
+!sed 's/.fits/.fits .\/filter_z\//' object_zbf_z.tmp > object_zbf_z.cl
+
+!sed 's/a/mv a/' object_zbf_i.list > object_zbf_i.tmp
+!sed 's/.fits/.fits .\/filter_i\//' object_zbf_i.tmp > object_zbf_i.cl
+
+cl < object_zbf_g.cl
+cl < object_zbf_r.cl
+cl < object_zbf_u.cl
+cl < object_zbf_z.cl
+cl < object_zbf_i.cl
+
+# TO UNDO
+mv ./filter_g/* .
+mv ./filter_r/* .
+mv ./filter_u/* .
+mv ./filter_z/* .
+mv ./filter_i/* .
+
+
+
+# TO UNDO
+mv ./_zbfiles/*_zb.fits .
+rm -rf ./*_zbf.fits
+
+

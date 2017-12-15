@@ -1,0 +1,22 @@
+#!/bin/sh
+
+echo 'Please enter the full name of the Measurements.txt file output by AIJ, even if it is "Measurements.txt": '
+read DATAFILE
+echo 'Please enter the date on which this data was taken in the format YYMMDD: '
+read YYMMDD
+echo 'Please enter the filter in which the data was taken: [u,g,r,i,z]'
+read FILTER
+echo 'Please enter the midpoint of the transit in JD as given by the transit finder: '
+read MIDPOINT
+
+if [ ! -e "$DATAFILE" ] ; then
+	echo "$DATAFILE does not exist. Please try again with the correct data file name."
+elif [ -e "$DATAFILE" ] ; then
+	NEWDATAFILE="$FILTER"_"$YYMMDD".txt
+	IMAGES=images.list
+	awk '{print $6,$(NF-1),$(NF-0)}' $DATAFILE > $NEWDATAFILE
+	sed -i "1s/^/##Midpoint=245$MIDPOINT \n/" $NEWDATAFILE
+	sed -i "2d" $NEWDATAFILE
+	awk '{print $2}' $DATAFILE > $IMAGES
+	sed -i "1d" $IMAGES
+fi
