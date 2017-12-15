@@ -4,13 +4,10 @@
 #### Affiliation: Middle Tennessee State University
 #### 2017 University of Wyoming Astronomy REU
 
-## ACKNOWLEDGEMENTS
-
-Dr. Chip Kobulnicky:
-- The overscan subtraction and trimming of overscan regions was adapted from a cl script written by Dr. Kobulnicky specifically for the WIRO Double Prime Imager.
-
-David Kasper:
-- The utc_update script used in this script was written by David in order to correct an issue found in the DATEOBS keyword in the FITS headers of WIRO images.
+###### Notes:
+- This script was largely adapted from my existing cl script, so there is
+a bias towards usage of UNIX tools wrapped in python.
+- Elegance was definitely *not* a priority in this script. My apologies.
 
 ## Synopsis:
 In a bash shell, and in a directory containing your
@@ -183,3 +180,10 @@ images. I would just use a cl script to display each
 image and move images that are clearly NOT science images
 into a donotuse directory. Otherwise, to my knowledge,
 this is the only issue that has come up.
+
+## ACKNOWLEDGEMENTS
+Dr. Chip Kobulnicky:
+- The overscan subtraction and trimming of overscan regions was adapted from a cl script written by Dr. Kobulnicky specifically for the WIRO Double Prime Imager.
+
+David Kasper:
+- The utc_update script used in this script was written by David in order to correct an issue found in the DATEOBS keyword in the FITS headers of WIRO images.
