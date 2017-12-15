@@ -1,8 +1,8 @@
 # WIRO Double Prime PyRAF Reduction Script
 
-### Author: Jackson L. Cole
-### Affiliation: Middle Tennessee State University
-### 2017 University of Wyoming Astronomy REU
+#### Author: Jackson L. Cole
+#### Affiliation: Middle Tennessee State University
+#### 2017 University of Wyoming Astronomy REU
 
 ## ACKNOWLEDGEMENTS
 
@@ -52,15 +52,15 @@ data is in the working directory (i.e.: if you took 30
 images during the night, then the files present in the
 directory should include:
 
-		a001.fit
-		a002.fit
-		a003.fit
-		.
-		.
-		.
-		a028.fit
-		a029.fit
-		a030.fit
+	a001.fit
+	a002.fit
+	a003.fit
+	.
+	.
+	.
+	a028.fit
+	a029.fit
+	a030.fit
 
 It is also critical that the images follow the naming
 convention seen above!!
@@ -93,7 +93,7 @@ the range of images that correspond to that object. Again,
 you will be allowed to edit these files before continuing.
 They are each named with the naming convention
 
-		object.#.targetname.list
+	object.#.targetname.list
 
 You will then be asked to enter the range of images
 corresponding to the bias frames. Again, if for whatever reason
@@ -158,14 +158,14 @@ organized into directories based on the target names given in
 the script setup, and then by filter within each target
 directory. The convention is as follows:
 
-		object.#.targetname/filter_*/image
+	object.#.targetname/filter_*/image
 
 ## Potential issues:
 
 As of right now, this script calls on other scripts which
 are located (for the most part, I believe) in
 
-		/d/www/jcole/public_html/scripts
+	/d/www/jcole/public_html/scripts
 
 If this directory is ever deleted, issues would definitely arise.
 I would suggest that if this script ever gains any traction,
@@ -183,4 +183,3 @@ images. I would just use a cl script to display each
 image and move images that are clearly NOT science images
 into a donotuse directory. Otherwise, to my knowledge,
 this is the only issue that has come up.
-
