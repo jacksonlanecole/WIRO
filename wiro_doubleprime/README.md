@@ -7,7 +7,7 @@
 ###### Notes:
 - This script was largely adapted from my existing cl script, so there is
 a bias towards usage of UNIX tools wrapped in python.
-- Elegance was definitely *not* a priority in this script. My apologies.
+- ***Elegance was definitely *not* a priority in this script. My apologies.***
 
 ## Synopsis:
 In a bash shell, and in a directory containing your
